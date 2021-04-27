@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> -->
+    <link rel="stylesheet" href="./css/style.css">
+
+</head>
+
+<body>
+    <div class="login-form">
+        <form id="frmLogin" method="post">
+            <h2 class="text-center">Log in</h2>
+            <div class="errMsg"></div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="email" required="required" name="email">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Password" required="required" name="pwd">
+            </div>
+            <div class="form-group">
+                <button type="button" id="btnLogin" class="btn btn-primary btn-block">Log in</button>
+            </div>
+            <div class="clearfix">
+
+            </div>
+        </form>
+        <p class="text-center"><a href="register.html">Create an Account</a></p>
+    </div>
+</body>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script>
+
+        function formatErrorMessage(jqXHR, exception) 
+        {
+            if (jqXHR.status === 0) {
+                return ('Not connected.\nPlease verify your network connection.');
+            } else if (jqXHR.status == 404) {
+                return ('The requested page not found. [404]');
+            } else if (jqXHR.status == 500) {
+                return ('Internal Server Error [500].');
+            } else if (exception === 'parsererror') {
+                return ('Requested JSON parse failed.');
+            } else if (exception === 'timeout') {
+                return ('Time out error.');
+            } else if (exception === 'abort') {
+                return ('Ajax request aborted.');
+            } else {
+                return ('Uncaught Error.\n' + jqXHR.responseText);
+            }
+        }
+
+
+        $(document).on('click', '#btnLogin', function(e){
+            e.preventDefault();
+            var formData = $('#frmLogin').serialize();
+            var displayMessage = $('.errMsg');
+
+            swal("Please wait...");
+            displayMessage.html('<div class="alert alert-info mt-3 text-center" role="alert"> Please wait... </div>');
+
+            $.ajax({
+                async: true,
+                url: 'ajaxProcessLogin.php',
+                type: 'POST',
+                data: formData,
+                success: function (msg) {
+                    if(msg == 'success'){
+                        $('#frmLogin')[0].reset();
+                        swal("Good job!", "Login Successful.", "success");
+                        displayMessage.html('<div class="alert alert-success text-center" role="alert"> Login Successful. </div>');
+                        setTimeout((function(){ location.href = 'dashboard.php' }), 3000);
+                    }else{
+                        displayMessage.html('<div class="alert alert-danger text-center" role="alert"> '+msg+' </div>');
+                        swal("Oops!", ""+msg+"", "error");
+                    }
+                },
+                error: function(x,e) {            
+                    displayMessage.html('<div class="alert alert-danger text-center" role="alert"> '+formatErrorMessage(x, e)+' </div>');
+                    swal("Oops!", ""+formatErrorMessage(x, e)+"", "error");
+                }
+            })
+        });
+    </script>
+
+
+</html>
